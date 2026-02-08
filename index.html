@@ -2,17 +2,17 @@
 <html>
 
 <head>
-    <title>S10.run.adds</title> 
+    <title>S10.7pace</title> 
 <link rel="stylesheet" type="text/css" href="webix.css">
 <script type="text/javascript" src="webix.js"></script>
-<style>  body { background: url(s10adds.png); background-repeat: no-repeat; background-size: cover;} </style>
 <style> .tpred { color: #EC3774; background: #fff; border: .4em solid; border-color: rgb(256,256,256); margin: 0 0 0 -.4em;}</style>
 <style> .tpblue { color: #00ccff; background: #fff; border: .4em solid; border-color: rgb(256,256,256); margin: 0 0 0 -.4em;}</style>
 <style> .tpyellow { color: #e9df40; background: #fff; border: .4em solid; border-color: rgb(256,256,256); margin: 0 0 0 -.4em;}</style>
 </head>
 
 <body>
-&emsp;<span style='color:blue'><i><b>S10.run.adds</b></i></span>&emsp;<input type="file" name="inputfile" id="inputfile" accept=".html">&emsp;<span id="ffile"></span>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<span id="student"></span>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<span id="trainer"></span>
+
+
     <pre id="output"></pre>
 
 <script type="text/javascript">
@@ -24,28 +24,42 @@ var c ;
 var d ;
 var m1 = "mountPage('studentTasks',";
 var m2 = "<!-- Meta Pixel Code -->" ;
+var m3 = '"trainingsRequests":';	
 
 var f ;
 
+// 1. Сразу сообщаем родителю, что мы загрузились
+if (window.opener) {
+    window.opener.postMessage("PARSER_READY", "*");
+} else {
+    alert("Запустите букмарклет на фоне раздела задач S10.run");
+}
 
-        document.getElementById('inputfile').addEventListener('change', function () {
-                fff = this.files[0].name;
-                let fr = new FileReader();
-                fr.onload = function () {
-//                    document.getElementById('output').textContent = fr.result;
+//        document.getElementById('inputfile').addEventListener('change', function () {
+//                fff = this.files[0].name;
+//                let fr = new FileReader();
+//                fr.onload = function () {    a= fr.result;
 
-                a= fr.result;
+window.addEventListener("message", (event) => {
+    // Проверка, что пришло именно наше сообщение
+    if (event.data && event.data.type === "DATA_PAYLOAD") {
+        const receivedText = event.data.text;
+//        console.log("Успех! Получено символов:", receivedText.length);
+		a=receivedText;
 
-
-
+//alert(a);
 				
- if ( a.includes(m1) && a.includes(m2)	&& !(fff.includes('s10.adds.html'))	) {	  
+ if ( a.includes(m1) && a.includes(m2)	) {	  
 				
                 b="["+ a.slice(a.indexOf(m1)+m1.length);
-                c=b.slice(0,b.lastIndexOf(m2)-13)+"]";
+//                c=b.slice(0,b.lastIndexOf(m2)-13)+"]";
+                c=b.slice(0,b.lastIndexOf(m3))+'"trainingsRequests": []}]';
+
+//alert(c.slice(-40));
+	 
 } else {
 
-return alert("���� �� �������� ����������!");
+return alert("Запустите букмарклет на фоне раздела задач S10.run");
 
 }
 
@@ -55,10 +69,10 @@ return alert("���� �� �������� ����������!");
 
 //document.getElementById('output').textContent = c.slice(0, 300) + "\n=================================================\n" + c.slice(-400);  
 
-document.getElementById('student').textContent = 'student:'  + '        ' + Valid_Student();
-document.getElementById('trainer').textContent = 'trainer:'  + '        ' + Valid_Trainer();
-document.getElementById('ffile').textContent = 'file:'       + '        ' + fff;
-document.getElementById('inputfile').setAttribute("type", "hidden");
+//document.getElementById('student').textContent = 'student:'  + '        ' + Valid_Student();
+//document.getElementById('trainer').textContent = 'trainer:'  + '        ' + Valid_Trainer();
+//document.getElementById('ffile').textContent = 'file:'       + '        ' + fff;
+//document.getElementById('inputfile').setAttribute("type", "hidden");
 
 function Valid_Student() {
   try {
@@ -86,6 +100,53 @@ function Valid_Comment(r,t) {
   }
 }
 
+function Valid_Job(r,t) {
+  try {
+    return d[0].studentTasksInfo.diaryTasks[r].comment;
+  } catch {
+    return t;
+  }
+}
+
+// type treni $.studentTasksInfo.diaryTasks[0].type
+
+function Valid_Ttype(r,t) {
+  try {
+  t="";
+switch (d[0].studentTasksInfo.diaryTasks[r].type) {
+  case 0:
+    t = ""; // отдых
+    break;
+  case 1:
+    t = "Восстановительная";
+    break;
+  case 2:
+    t = "Развивающая";
+    break;
+  case 3:
+    t = "Интервальная";
+    break;
+  case 4:
+    t = "Повторная";
+    break;
+  case 5:
+    t = "Длительная";
+    break;
+  case 6:
+    t = "";
+    break;
+  case 7:
+    t = "Силовая";
+    break;		
+  default:
+    t = ""; // Handles unexpected values
+}
+    return t;
+
+  } catch {
+    return t;
+  }
+}
 
 
 n2 = d[0].studentTasksInfo.diaryTasks.length;
@@ -100,7 +161,7 @@ c0 = Valid_Comment(i,"")
   c0 = c0.replace(/"/g, "'");
   c0 = c0.replace(/(\r\n|\n|\r)/gm, ""); 
   c0 = c0.replace(/<[^>]*>/g, '');
-  c2 = c2 + "<span style='color:blue'>--- " + d[0].studentTasksInfo.diaryTasks[i].date + " ---</span></br>" + c0 + "</br>\n"
+  c2 = c2 + "<span style='color:blue'>--- " + d[0].studentTasksInfo.diaryTasks[i].date + " [ " + Valid_Ttype(i,"") + " ] " + Valid_Job(i,"") + "</span></br>" + c0 + "</br>\n"
 }
 
 c2 = c2.slice(0,c2.length-2);
@@ -138,39 +199,163 @@ for(var i=0; i < d[0].studentTasksInfo.diaryTasks[r].tracks.length ; i++){
         return tmp[s];
 
   } catch {
-    return t;
+  
+      try {
+			const tmp = [];
+			for(var i=0; i < d[0].studentTasksInfo.diaryTasks[r].tracks.length ; i++){
+			for(var j=0; j < d[0].studentTasksInfo.diaryTasks[r].tracks[i].json.laps.length ; j++){
+			tmp.push(d[0].studentTasksInfo.diaryTasks[r].tracks[i].json.laps[j].average_speed);
+				}
+			}	  
+            
+            num=(1000/tmp[s])/60;			
+			
+//			return num.toFixed(2);
+            return (Math.round(num * 100) / 100) + 0.01; 
+			
+           } catch {
+
+	       	return t;
+	
+	      }
+    
+	return t;
   }
 }
 
+//==============================
+
+// d[0].studentTasksInfo.diaryTasks[5].tracks[0].json.laps[0].moving_time
+// d[0].studentTasksInfo.diaryTasks[5].tracks[0].json.laps[0].elapsed_time
 //============================
+
+
+// 24 slots for pace slots
+
+let slots = ["2:50","3:00","3:10","3:20","3:30","3:40","3:50","4:00","4:10","4:20","4:30","4:40","4:50","5:00","5:10","5:20","5:30","5:40","5:50","6:00","6:10","6:20","6:30","6:40"];
+
+
+function Valid_Slot(r,s,t) {
+ 
+ try {
+
+const z24 = Array(24).fill(0);
+ind = 0;
+
+//console.log('r=' +r+',s='+s);
+
+for(var i=0; i < d[0].studentTasksInfo.diaryTasks[r].tracks.length ; i++){
+ for(var j=0; j < Object.values(d[0].studentTasksInfo.diaryTasks[r].tracks[i].json.pacebuckets).length ; j++){
+
+    ind = slots.indexOf(Object.keys(d[0].studentTasksInfo.diaryTasks[r].tracks[i].json.pacebuckets)[j]);
+
+//alert(ind);
+
+	if ( ind > -1 ) {
+	
+	z24[ind] = z24[ind] + Object.values(d[0].studentTasksInfo.diaryTasks[r].tracks[i].json.pacebuckets)[j];
+
+	
+	}
+
+ }
+}
+
+//console.log('z24=' +z24[s]+'\n');
+
+
+        return Math.round((z24[s]/1000) * 10) / 10;
+
+  } catch {
+    
+	return t;
+  }
+}
+
+
 
 
 function Valid_MaxHeart(r,t) {
   try {
 var tmp = 0;
-
+var tt = 0;
 for(var i=0; i < d[0].studentTasksInfo.diaryTasks[r].tracks.length ; i++){
- tmp = Math.max(tmp,d[0].studentTasksInfo.diaryTasks[r].tracks[i].json.max_heartrate);
+ tt = d[0].studentTasksInfo.diaryTasks[r].tracks[i].json.max_heartrate;
+if ( tt === undefined) {
+    throw new Error("Переменная tt не определена (undefined)!");
+}
+ tmp = Math.max(tmp,tt);
  }
         return tmp;
-  } catch {
+ } catch {
+      try {
+			tmp = 0;
+			tt = 0;
+			for(var i=0; i < d[0].studentTasksInfo.diaryTasks[r].tracks.length ; i++){
+			for(var j=0; j < d[0].studentTasksInfo.diaryTasks[r].tracks[i].json.laps.length ; j++){
+             tt = d[0].studentTasksInfo.diaryTasks[r].tracks[i].json.laps[j].hr ;
+
+if ( tt === undefined) {
+    throw new Error("Переменная tt2 не определена (undefined)!");
+}
+			tmp = Math.max(tmp,tt);
+				}
+			}	  
+            return tmp; 
+           } catch {
+	       	return NaN;
+	      }
     return t;
   }
 }
+
+//function Valid_AvgHeart(r,t) {
+//  try {
+//var tmp = 0;
+//for(var i=0; i < d[0].studentTasksInfo.diaryTasks[r].tracks.length ; i++){
+// tmp = tmp + d[0].studentTasksInfo.diaryTasks[r].tracks[i].json.average_heartrate;
+// }
+//        return tmp/d[0].studentTasksInfo.diaryTasks[r].tracks.length;
+//  } catch {
+//    return t;
+//  }
+//}
 
 function Valid_AvgHeart(r,t) {
   try {
 var tmp = 0;
-
+var tt = 0;
 for(var i=0; i < d[0].studentTasksInfo.diaryTasks[r].tracks.length ; i++){
- tmp = tmp + d[0].studentTasksInfo.diaryTasks[r].tracks[i].json.average_heartrate;
+ tt = d[0].studentTasksInfo.diaryTasks[r].tracks[i].json.average_heartrate;
+if ( tt === undefined) {
+    throw new Error("Переменная tt не определена (undefined)!");
+}
+ tmp = tmp+tt;
  }
         return tmp/d[0].studentTasksInfo.diaryTasks[r].tracks.length;
-  } catch {
+ } catch {
+      try {
+			tmp = 0;
+			tt = 0;
+			ttt = 0;
+			for(var i=0; i < d[0].studentTasksInfo.diaryTasks[r].tracks.length ; i++){
+			for(var j=0; j < d[0].studentTasksInfo.diaryTasks[r].tracks[i].json.laps.length ; j++){
+             tt = d[0].studentTasksInfo.diaryTasks[r].tracks[i].json.laps[j].hr ;
+
+if ( tt === undefined) {
+    throw new Error("Переменная tt2 не определена (undefined)!");
+}
+			tmp = tmp+tt;
+			ttt = ttt+1;
+				}
+			}	  
+            return tmp/ttt;
+           } catch {
+	       	return NaN;
+	      }
     return t;
   }
 }
-
 
 //============================
 function Valid_M200(r,t) {
@@ -322,311 +507,12 @@ return mm + ":" + ss;
 }
 
 
-
-t1 = "" ;
-
-for(var i = n2-1; i > n1-1 ; i--){
-  t1 = t1 + '{ "timed":"' + Valid_Timea(i,"") + '", "id":"' + i + '", "dayd":"' + d[0].studentTasksInfo.diaryTasks[i].date.slice(-2) + '"},\n'
- }
-
-t1 = "[\n" + t1.slice(0,t1.length-2) + "\n]" ;
-
-
-gg = JSON.parse(t1);
-
-gra0 = {  width:420,  height:111,  type:"clean",
-cols:[
-        {
-          view:"chart",
-          type:"line",
-          value:"#timed#",  padding:{left:25,bottom: 17  },
-          preset:"plot",
-		  label: function(obj){
-			return "<span style='color:blue'><font size=1>" + parseInt(obj.timed,10) + "</font></span>";
-			},
-          xAxis:{
-            template:"'#dayd#"
-          },
-          yAxis:{
-          },
-  legend:{layout:"x", height:-10, align:"center", valign:"middle",
-    values:[
-      {text:"daily moving_time", toggle:true,markerType: "item"}
-    ]
-  }	,	  
-  series:[
-    {  type:"line",  value:"#timed#", item:{radius:2,borderColor: "#EC3774"}, line:{color:"#EC3774",width:2} }
-  ],		  
-          data: gg
-        }
-
-]
-};
-
-
-
-
-t1 = "" ;
-
-for(var i = n2-1; i > n1-1 ; i--){
-  t1 = t1 + '{ "kmCompleted":"' + d[0].studentTasksInfo.diaryTasks[i].kmCompleted + '", "id":"' + i + '", "dayd":"' + d[0].studentTasksInfo.diaryTasks[i].date.slice(-2) + '"},\n'
- }
-
-t1 = "[\n" + t1.slice(0,t1.length-2) + "\n]" ;
-
-gg = JSON.parse(t1);
-
-gra1 = {  width:420,  height:111,  type:"clean",
-cols:[
-        {
-          view:"chart",
-          type:"line",
-          value:"#kmCompleted#",  padding:{left:25,bottom: 17  },
-          preset:"plot",
-		  label: function(obj){
-			return "<span style='color:blue'><font size=1>" + parseInt(obj.kmCompleted,10) + "</font></span>";
-			} ,
-		xAxis:{
-            template:"'#dayd#"
-          },
-          yAxis:{
-          },
-  legend:{layout:"x", height:-10, align:"center", valign:"middle",
-    values:[
-      {text:"daily kmCompleted", toggle:true,markerType: "item"}
-    ]
-  }	,	  
-  series:[
-    {  type:"line",  value:"#kmCompleted#", item:{radius:2,borderColor: "#EC3774"}, line:{color:"#EC3774",width:2} }
-  ],		  
-          data: gg
-        }
-
-]
-};
-
-// -----------------------------------------
-
-t1 = "" ;
-
-for(var i = n2-1; i > n1-1 ; i--){
-  t1 = t1 + '{ "pace200":"-' + Valid_M200(i,"") + '", "pace1000":"-' + Valid_M1000(i,"") + '", "pace5000":"-' + Valid_M5000(i,"") + '", "id":"' + i + '", "dayd":"' + d[0].studentTasksInfo.diaryTasks[i].date.slice(-2) + '"},\n' 
- }
-
-t1 = "[\n" + t1.slice(0,t1.length-2) + "\n]" ;
-
-gg = JSON.parse(t1);
-
-gra2 = {  width:420,  height:111,  type:"clean", //padding:{left:14,bottom: 17  }, radius:0,
-cols:[
-        {
-          view:"chart",
-          type:"line",
-          padding:{left:25,bottom: 17  },
-          preset:"plot",
-          xAxis:{
-            template:"'#dayd#"
-          },
-          yAxis:{start:-7, step:1, end:-3,template: function(obj) {return Math.abs(obj);}},
-  legend:{layout:"x", height:-10, align:"center", valign:"middle",
-    values:[
-      {text:"pace5000", toggle:true,markerType: "item"},
-      {text:"pace1000", toggle:true,markerType: "item"},
-      {text:"pace200", toggle:true,markerType: "item"}
-    ]
-  }	,	  
-  scheme:{ $group: { by:"dayd",  map:{
-        pace5000:["pace5000","any"],
-        pace1000:["pace1000","any"],
-        pace200:["pace200","any"]
-      }
-    }
-  },  series:[
-    {  type:"line",  value:"#pace5000#", tooltip:{css:"tpyellow",template:function(obj) {return To_Pace(obj.pace5000);}}, item:{radius:3,borderColor: "#e9df40"}, line:{color:"#e9df40",width:2} },
-    {  type:"line",  value:"#pace1000#", tooltip:{css:"tpblue",template:function(obj) {return To_Pace(obj.pace1000);}}, item:{radius:3,borderColor: "#00ccff"}, line:{color:"#00ccff",width:2} },
-    {  type:"line",  value:"#pace200#", tooltip:{css:"tpred", template:function(obj) {return To_Pace(obj.pace200);}}, item:{radius:3,borderColor: "#EC3774"}, line:{color:"#EC3774",width:2} }
-  ],		  
-          data: gg
-        }
-
-]
-};
-
-// -----------------------------------------
-
-t1 = "" ;
-
-for(var i = n2-1; i > n1-1 ; i--){
-  t1 = t1 + '{ "max_heartrate":"' + Valid_MaxHeart(i,"") + '", "avg_heartrate":"' + Valid_AvgHeart(i,"") + '", "id":"' + i + '", "dayd":"' + d[0].studentTasksInfo.diaryTasks[i].date.slice(-2) + '"},\n' 
- }
-
-t1 = "[\n" + t1.slice(0,t1.length-2) + "\n]" ;
-
-//document.getElementById('output').textContent = t1;  
-
-gg = JSON.parse(t1);
-
-gra3 = {  width:420,  height:111,  type:"clean", 
-cols:[
-        {
-          view:"chart",
-          type:"line",
-          padding:{left:25,bottom: 17  },
-          preset:"plot",
-          xAxis:{
-            template:"'#dayd#"
-          },
-          yAxis:{},
-  legend:{layout:"x", height:-10, align:"center", valign:"middle",
-    values:[
-      {text:"avg_heartrate", toggle:true,markerType: "item"},
-      {text:"max_heartrate", toggle:true,markerType: "item"}
-    ]
-  }	,	  
-  scheme:{ $group: { by:"dayd",  map:{
-        avg_heartrate:["avg_heartrate","any"],
-        max_heartrate:["max_heartrate","any"]
-      }
-    }
-  },  series:[
-    {  type:"line",  value:"#avg_heartrate#", tooltip:{css:"tpblue",template:function(obj) {return Math.floor(obj.avg_heartrate);}}, item:{radius:3,borderColor: "#00ccff"}, line:{color:"#00ccff",width:2} },
-    {  type:"line",  value:"#max_heartrate#", tooltip:{css:"tpred", template:function(obj) {return obj.max_heartrate;}}, item:{radius:3,borderColor: "#EC3774"}, line:{color:"#EC3774",width:2} }
-  ],		  
-          data: gg
-        }
-
-]
-};
-
-// -----------------------------------------
-
-t1 = "" ;
-
-for(var i = n2-1; i > n1-1 ; i--){
-  t1 = t1 + '{ "gain":"' + Valid_Gain(i,"") + '", "id":"' + i + '", "dayd":"' + d[0].studentTasksInfo.diaryTasks[i].date.slice(-2) + '"},\n'
- }
-
-t1 = "[\n" + t1.slice(0,t1.length-2) + "\n]" ;
-
-gg = JSON.parse(t1);
-
-gra4 = {  width:420,  height:111,  type:"clean",
-cols:[
-        {
-          view:"chart",
-          type:"line",
-          value:"#gain#",  padding:{left:25,bottom: 17  },
-          preset:"plot",
-		  label: function(obj){
-			return "<span style='color:blue'><font size=1>" + parseInt(obj.gain,10) + "</font></span>";
-			},
-			xAxis:{
-            template:"'#dayd#"
-          },
-          yAxis:{
-          },
-  legend:{layout:"x", height:-10, align:"center", valign:"middle",
-    values:[
-      {text:"daily total_elevation_gain", toggle:true,markerType: "item"}
-    ]
-  }	,	  
-  series:[
-    {  type:"line",  value:"#gain#", item:{radius:2,borderColor: "#EC3774"}, line:{color:"#EC3774",width:2} }
-  ],		  
-          data: gg
-        }
-
-]
-};
-
-// -----------------------------------------
-
-t1 = "" ;
-
-for(var i = n2-1; i > n1-1 ; i--){
-  t1 = t1 + '{ "impulse":"' + Valid_impulse(i,"") + '", "id":"' + i + '", "dayd":"' + d[0].studentTasksInfo.diaryTasks[i].date.slice(-2) + '"},\n'
- }
-
-t1 = "[\n" + t1.slice(0,t1.length-2) + "\n]" ;
-
-gg = JSON.parse(t1);
-
-gra5 = {  width:420,  height:111,  type:"clean",
-cols:[
-        {
-          view:"chart",
-          type:"line",
-          value:"#impulse#",  padding:{left:25,bottom: 17  },
-          preset:"plot",
-		  label: function(obj){
-			return "<span style='color:blue'><font size=1>" + parseInt(obj.impulse,10) + "</font></span>";
-			},
-			xAxis:{
-            template:"'#dayd#"
-          },
-          yAxis:{
-          },
-  legend:{layout:"x", height:-10, align:"center", valign:"middle",
-    values:[
-      {text:"daily impulse", toggle:true,markerType: "item"}
-    ]
-  }	,	  
-  series:[
-    {  type:"line",  value:"#impulse#", item:{radius:2,borderColor: "#EC3774"}, line:{color:"#EC3774",width:2} }
-  ],		  
-          data: gg
-        }
-
-]
-};
-
-// -----------------------------------------
-
-t1 = "" ;
-
-for(var i = n2-1; i > n1-1 ; i--){
-  t1 = t1 + '{ "gs":"' + Valid_gs(i,"") + '", "id":"' + i + '", "dayd":"' + d[0].studentTasksInfo.diaryTasks[i].date.slice(-2) + '"},\n'
- }
-
-t1 = "[\n" + t1.slice(0,t1.length-2) + "\n]" ;
-
-gg = JSON.parse(t1);
-
-gra6 = {  width:420,  height:111,  type:"clean",
-cols:[
-        {
-          view:"chart",
-          type:"line",
-          value:"#gs#",  padding:{left:25,bottom: 17  },
-          preset:"plot",
-		  label: function(obj){
-			return "<span style='color:blue'><font size=1>" + parseInt(obj.gs,10) + "</font></span>";
-			},
-			xAxis:{
-            template:"'#dayd#"
-          },
-          yAxis:{
-          },
-  legend:{layout:"x", height:-10, align:"center", valign:"middle",
-    values:[
-      {text:"daily gs", toggle:true,markerType: "item"}
-    ]
-  }	,	  
-  series:[
-    {  type:"line",  value:"#gs#", item:{radius:2,borderColor: "#EC3774"}, line:{color:"#EC3774",width:2} }
-  ],		  
-          data: gg
-        }
-
-]
-};
-
 // -----------------------------------------
 
 f1 = "" ;
 
-for(var i = 0; i < e1 ; i++){
-  f1 = f1 + '{ "pace14":"-' + Valid_Pace(n1+14,i,"") + '", "pace7":"-' + Valid_Pace(n1+7,i,"") + '", "pace0":"-' + Valid_Pace(n1,i,"") + '", "km":"' + (i+1) + '"},\n'
+for(var i = 0; i < 24 ; i++){
+  f1 = f1 + '{ "pace14":"' + Valid_Slot(n1+14,i,"") + '", "pace7":"' + Valid_Slot(n1+7,i,"") + '", "pace0":"' + Valid_Slot(n1,i,"") + '", "km":"' + slots[i] + '"},\n'
  }
 
 f1 = "[\n" + f1.slice(0,f1.length-2) + "\n]" ;
@@ -634,7 +520,7 @@ f1 = "[\n" + f1.slice(0,f1.length-2) + "\n]" ;
 
 gg = JSON.parse(f1);
 
-gr0 = {  width:380,  height:111,  type:"clean", 
+gr0 = {  width:720,  height:111,  type:"clean", 
 cols:[
         {
           view:"chart",
@@ -644,12 +530,13 @@ cols:[
           xAxis:{
             template:"'#km#"
           },
-          yAxis:{start:-7, step:1, end:-3,template: function(obj) {return Math.abs(obj);}},
+          yAxis:{
+		  },
   legend:{layout:"x", height:-10, align:"center", valign:"middle",
     values:[
       {text:"-14", toggle:true,markerType: "item"},
       {text:"-7", toggle:true,markerType: "item"},
-      {text:d[0].studentTasksInfo.diaryTasks[n1+0].date+"  pace/km", toggle:true,markerType: "item"}
+      {text:d[0].studentTasksInfo.diaryTasks[n1+0].date+"  km/Slots", toggle:true,markerType: "item"}
     ]
   }	,	  
   scheme:{ $group: { by:"km",  map:{
@@ -674,8 +561,8 @@ cols:[
 
 f2 = "" ;
 
-for(var i = 0; i < e2 ; i++){
-  f2 = f2 + '{ "pace15":"-' + Valid_Pace(n1+15,i,"") + '", "pace8":"-' + Valid_Pace(n1+8,i,"") + '", "pace1":"-' + Valid_Pace(n1+1,i,"") + '", "km":"' + (i+1) + '"},\n'
+for(var i = 0; i < 24 ; i++){
+  f2 = f2 + '{ "pace15":"' + Valid_Slot(n1+15,i,"") + '", "pace8":"' + Valid_Slot(n1+8,i,"") + '", "pace1":"' + Valid_Slot(n1+1,i,"") + '", "km":"' + slots[i] + '"},\n'
  }
 
 f2 = "[\n" + f2.slice(0,f2.length-2) + "\n]" ;
@@ -683,7 +570,7 @@ f2 = "[\n" + f2.slice(0,f2.length-2) + "\n]" ;
 
 gg = JSON.parse(f2);
 
-gr1 = {  width:380,  height:111,  type:"clean", 
+gr1 = {  width:720,  height:111,  type:"clean", 
 cols:[
         {
           view:"chart",
@@ -693,12 +580,13 @@ cols:[
           xAxis:{
             template:"'#km#"
           },
-          yAxis:{start:-7, step:1, end:-3,template: function(obj) {return Math.abs(obj);}},
+          yAxis:{
+		  },
   legend:{layout:"x", height:-10, align:"center", valign:"middle",
     values:[
       {text:"-14", toggle:true,markerType: "item"},
       {text:"-7", toggle:true,markerType: "item"},
-      {text:d[0].studentTasksInfo.diaryTasks[n1+1].date+"  pace/km", toggle:true,markerType: "item"}
+      {text:d[0].studentTasksInfo.diaryTasks[n1+1].date+"  km/Slots", toggle:true,markerType: "item"}
     ]
   }	,	  
   scheme:{ $group: { by:"km",  map:{
@@ -721,15 +609,15 @@ cols:[
 
 f3 = "" ;
 
-for(var i = 0; i < e3 ; i++){
-  f3 = f3 + '{ "pace16":"-' + Valid_Pace(n1+16,i,"") + '", "pace9":"-' + Valid_Pace(n1+9,i,"") + '", "pace2":"-' + Valid_Pace(n1+2,i,"") + '", "km":"' + (i+1) + '"},\n'
+for(var i = 0; i < 24 ; i++){
+  f3 = f3 + '{ "pace16":"' + Valid_Slot(n1+16,i,"") + '", "pace9":"' + Valid_Slot(n1+9,i,"") + '", "pace2":"' + Valid_Slot(n1+2,i,"") + '", "km":"' + slots[i] + '"},\n'
  }
 
 f3 = "[\n" + f3.slice(0,f3.length-2) + "\n]" ;
 
 gg = JSON.parse(f3);
 
-gr2 = {  width:380,  height:111,  type:"clean", 
+gr2 = {  width:720,  height:111,  type:"clean", 
 cols:[
         {
           view:"chart",
@@ -739,12 +627,13 @@ cols:[
           xAxis:{
             template:"'#km#"
           },
-          yAxis:{start:-7, step:1, end:-3,template: function(obj) {return Math.abs(obj);}},
+          yAxis:{
+		  },
   legend:{layout:"x", height:-10, align:"center", valign:"middle",
     values:[
       {text:"-14", toggle:true,markerType: "item"},
       {text:"-7", toggle:true,markerType: "item"},
-      {text:d[0].studentTasksInfo.diaryTasks[n1+2].date+"  pace/km", toggle:true,markerType: "item"}
+      {text:d[0].studentTasksInfo.diaryTasks[n1+2].date+"  km/Slots", toggle:true,markerType: "item"}
     ]
   }	,	  
   scheme:{ $group: { by:"km",  map:{
@@ -767,15 +656,15 @@ cols:[
 
 f4 = "" ;
 
-for(var i = 0; i < e4 ; i++){
-  f4 = f4 + '{ "pace17":"-' + Valid_Pace(n1+17,i,"") + '", "pace10":"-' + Valid_Pace(n1+10,i,"") + '", "pace3":"-' + Valid_Pace(n1+3,i,"") + '", "km":"' + (i+1) + '"},\n'
+for(var i = 0; i < 24 ; i++){
+  f4 = f4 + '{ "pace17":"' + Valid_Slot(n1+17,i,"") + '", "pace10":"' + Valid_Slot(n1+10,i,"") + '", "pace3":"' + Valid_Slot(n1+3,i,"") + '", "km":"' + slots[i] + '"},\n'
  }
 
 f4 = "[\n" + f4.slice(0,f4.length-2) + "\n]" ;
 
 gg = JSON.parse(f4);
 
-gr3 = {  width:380,  height:111,  type:"clean", 
+gr3 = {  width:720,  height:111,  type:"clean", 
 cols:[
         {
           view:"chart",
@@ -785,12 +674,13 @@ cols:[
           xAxis:{
             template:"'#km#"
           },
-          yAxis:{start:-7, step:1, end:-3,template: function(obj) {return Math.abs(obj);}},
+          yAxis:{
+		  },
   legend:{layout:"x", height:-10, align:"center", valign:"middle",
     values:[
       {text:"-14", toggle:true,markerType: "item"},
       {text:"-7", toggle:true,markerType: "item"},
-      {text:d[0].studentTasksInfo.diaryTasks[n1+3].date+"  pace/km", toggle:true,markerType: "item"}
+      {text:d[0].studentTasksInfo.diaryTasks[n1+3].date+"  km/Slots", toggle:true,markerType: "item"}
     ]
   }	,	  
   scheme:{ $group: { by:"km",  map:{
@@ -812,8 +702,8 @@ cols:[
 
 f5="" ;
 
-for(var i = 0; i < e5 ; i++){
-  f5 = f5 + '{ "pace18":"-' + Valid_Pace(n1+18,i,"") + '", "pace11":"-' + Valid_Pace(n1+11,i,"") + '", "pace4":"-' + Valid_Pace(n1+4,i,"") + '", "km":"' + (i+1) + '"},\n'
+for(var i = 0; i < 24 ; i++){
+  f5 = f5 + '{ "pace18":"' + Valid_Slot(n1+18,i,"") + '", "pace11":"' + Valid_Slot(n1+11,i,"") + '", "pace4":"' + Valid_Slot(n1+4,i,"") + '", "km":"' + slots[i] + '"},\n'
  }
 
 f5 = "[\n" + f5.slice(0,f5.length-2) + "\n]" ;
@@ -821,7 +711,7 @@ f5 = "[\n" + f5.slice(0,f5.length-2) + "\n]" ;
 
 gg = JSON.parse(f5);
 
-gr4 = {  width:380,  height:111,  type:"clean", 
+gr4 = {  width:720,  height:111,  type:"clean", 
 cols:[
         {
           view:"chart",
@@ -831,12 +721,13 @@ cols:[
           xAxis:{
             template:"'#km#"
           },
-          yAxis:{start:-7, step:1, end:-3,template: function(obj) {return Math.abs(obj);}},
+          yAxis:{
+		  },
   legend:{layout:"x", height:-10, align:"center", valign:"middle",
     values:[
       {text:"-14", toggle:true,markerType: "item"},
       {text:"-7", toggle:true,markerType: "item"},
-      {text:d[0].studentTasksInfo.diaryTasks[n1+4].date+"  pace/km", toggle:true,markerType: "item"}
+      {text:d[0].studentTasksInfo.diaryTasks[n1+4].date+"  km/Slots", toggle:true,markerType: "item"}
     ]
   }	,	  
   scheme:{ $group: { by:"km",  map:{
@@ -860,15 +751,15 @@ cols:[
 
 f6 = "" ;
 
-for(var i = 0; i < e6 ; i++){
-  f6 = f6 + '{ "pace19":"-' + Valid_Pace(n1+19,i,"") + '", "pace12":"-' + Valid_Pace(n1+12,i,"") + '", "pace5":"-' + Valid_Pace(n1+5,i,"") + '", "km":"' + (i+1) + '"},\n'
+for(var i = 0; i < 24 ; i++){
+  f6 = f6 + '{ "pace19":"' + Valid_Slot(n1+19,i,"") + '", "pace12":"' + Valid_Slot(n1+12,i,"") + '", "pace5":"' + Valid_Slot(n1+5,i,"") + '", "km":"' + slots[i] + '"},\n'
  }
 
 f6 = "[\n" + f6.slice(0,f6.length-2) + "\n]" ;
 
 gg = JSON.parse(f6);
 
-gr5 = {  width:380,  height:111,  type:"clean", 
+gr5 = {  width:720,  height:111,  type:"clean", 
 cols:[
         {
           view:"chart",
@@ -878,12 +769,13 @@ cols:[
           xAxis:{
             template:"'#km#"
           },
-          yAxis:{start:-7, step:1, end:-3,template: function(obj) {return Math.abs(obj);}},
+          yAxis:{
+		  },
   legend:{layout:"x", height:-10, align:"center", valign:"middle",
     values:[
       {text:"-14", toggle:true,markerType: "item"},
       {text:"-7", toggle:true,markerType: "item"},
-      {text:d[0].studentTasksInfo.diaryTasks[n1+5].date+"  pace/km", toggle:true,markerType: "item"}
+      {text:d[0].studentTasksInfo.diaryTasks[n1+5].date+"  km/Slots", toggle:true,markerType: "item"}
     ]
   }	,	  
   scheme:{ $group: { by:"km",  map:{
@@ -906,15 +798,15 @@ cols:[
 
 f7 = "" ;
 
-for(var i = 0; i < e7 ; i++){
-  f7 = f7 + '{ "pace20":"-' + Valid_Pace(n1+20,i,"") + '", "pace13":"-' + Valid_Pace(n1+13,i,"") + '", "pace6":"-' + Valid_Pace(n1+6,i,"") + '", "km":"' + (i+1) + '"},\n'
+for(var i = 0; i < 24 ; i++){
+  f7 = f7 + '{ "pace20":"' + Valid_Slot(n1+20,i,"") + '", "pace13":"' + Valid_Slot(n1+13,i,"") + '", "pace6":"' + Valid_Slot(n1+6,i,"") + '", "km":"' + slots[i] + '"},\n'
  }
 
 f7 = "[\n" + f7.slice(0,f7.length-2) + "\n]" ;
 
 gg = JSON.parse(f7);
 
-gr6 = {  width:380,  height:111,  type:"clean", 
+gr6 = {  width:720,  height:111,  type:"clean", 
 cols:[
         {
           view:"chart",
@@ -924,12 +816,13 @@ cols:[
           xAxis:{
             template:"'#km#"
           },
-          yAxis:{start:-7, step:1, end:-3,template: function(obj) {return Math.abs(obj);}},
+          yAxis:{
+		  },
   legend:{layout:"x", height:-10, align:"center", valign:"middle",
     values:[
       {text:"-14", toggle:true,markerType: "item"},
       {text:"-7", toggle:true,markerType: "item"},
-      {text:d[0].studentTasksInfo.diaryTasks[n1+6].date+"  pace/km", toggle:true,markerType: "item"}
+      {text:d[0].studentTasksInfo.diaryTasks[n1+6].date+"  km/Slots", toggle:true,markerType: "item"}
     ]
   }	,	  
   scheme:{ $group: { by:"km",  map:{
@@ -966,18 +859,6 @@ webix.ui(
  	          ]  
        },  
 	   { view:"resizer" },
-       { "id":"form1%" ,
-        "rows":[
-				 gra1 , { view:"resizer" },
-                 gra0 , { view:"resizer" },
-				 gra2 , { view:"resizer" },
-				 gra3 , { view:"resizer" },
-				 gra4 , { view:"resizer" },
-				 gra5 , { view:"resizer" },
-				 gra6
-			   ]
-		},  
-		{ view:"resizer" },
        { "id":"form2%" , 
         "rows":[
                  cmnt1 
@@ -990,15 +871,18 @@ webix.ui(
 
                 }
 
-                fr.readAsText(this.files[0]);
-            })
+//                fr.readAsText(this.files[0]);
+//            })
 
 
-
+        // ВАШ ПАРСЕР ТУТ:
+        // startParsing(receivedText); 
+//    }
+});
 
 
 </script>
-<script>window.addEventListener('mousemove', function(event){document.querySelector('body > div.webix_message_area > div > div').click()},{ once: true});</script>
+
 </body>
 
 </html>
