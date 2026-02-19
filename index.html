@@ -512,7 +512,7 @@ return mm + ":" + ss;
 f1 = "" ;
 
 for(var i = 0; i < 24 ; i++){
-  f1 = f1 + '{ "pace14":"' + Valid_Slot(n1+14,i,"") + '", "pace7":"' + Valid_Slot(n1+7,i,"") + '", "pace0":"' + Valid_Slot(n1,i,"") + '", "km":"' + slots[i] + '"},\n'
+  f1 = f1 + '{ "pace14":"' + Valid_Slot(n1+14,i,null) + '", "pace7":"' + Valid_Slot(n1+7,i,null) + '", "pace0":"' + Valid_Slot(n1,i,null) + '", "km":"' + slots[i] + '"},\n'
  }
 
 f1 = "[\n" + f1.slice(0,f1.length-2) + "\n]" ;
@@ -562,7 +562,7 @@ cols:[
 f2 = "" ;
 
 for(var i = 0; i < 24 ; i++){
-  f2 = f2 + '{ "pace15":"' + Valid_Slot(n1+15,i,"") + '", "pace8":"' + Valid_Slot(n1+8,i,"") + '", "pace1":"' + Valid_Slot(n1+1,i,"") + '", "km":"' + slots[i] + '"},\n'
+  f2 = f2 + '{ "pace15":"' + Valid_Slot(n1+15,i,null) + '", "pace8":"' + Valid_Slot(n1+8,i,null) + '", "pace1":"' + Valid_Slot(n1+1,i,null) + '", "km":"' + slots[i] + '"},\n'
  }
 
 f2 = "[\n" + f2.slice(0,f2.length-2) + "\n]" ;
@@ -610,7 +610,7 @@ cols:[
 f3 = "" ;
 
 for(var i = 0; i < 24 ; i++){
-  f3 = f3 + '{ "pace16":"' + Valid_Slot(n1+16,i,"") + '", "pace9":"' + Valid_Slot(n1+9,i,"") + '", "pace2":"' + Valid_Slot(n1+2,i,"") + '", "km":"' + slots[i] + '"},\n'
+  f3 = f3 + '{ "pace16":"' + Valid_Slot(n1+16,i,null) + '", "pace9":"' + Valid_Slot(n1+9,i,null) + '", "pace2":"' + Valid_Slot(n1+2,i,null) + '", "km":"' + slots[i] + '"},\n'
  }
 
 f3 = "[\n" + f3.slice(0,f3.length-2) + "\n]" ;
@@ -703,7 +703,7 @@ cols:[
 f5="" ;
 
 for(var i = 0; i < 24 ; i++){
-  f5 = f5 + '{ "pace18":"' + Valid_Slot(n1+18,i,"") + '", "pace11":"' + Valid_Slot(n1+11,i,"") + '", "pace4":"' + Valid_Slot(n1+4,i,"") + '", "km":"' + slots[i] + '"},\n'
+  f5 = f5 + '{ "pace18":"' + Valid_Slot(n1+18,i,null) + '", "pace11":"' + Valid_Slot(n1+11,i,null) + '", "pace4":"' + Valid_Slot(n1+4,i,null) + '", "km":"' + slots[i] + '"},\n'
  }
 
 f5 = "[\n" + f5.slice(0,f5.length-2) + "\n]" ;
@@ -752,7 +752,7 @@ cols:[
 f6 = "" ;
 
 for(var i = 0; i < 24 ; i++){
-  f6 = f6 + '{ "pace19":"' + Valid_Slot(n1+19,i,"") + '", "pace12":"' + Valid_Slot(n1+12,i,"") + '", "pace5":"' + Valid_Slot(n1+5,i,"") + '", "km":"' + slots[i] + '"},\n'
+  f6 = f6 + '{ "pace19":"' + Valid_Slot(n1+19,i,null) + '", "pace12":"' + Valid_Slot(n1+12,i,null) + '", "pace5":"' + Valid_Slot(n1+5,i,null) + '", "km":"' + slots[i] + '"},\n'
  }
 
 f6 = "[\n" + f6.slice(0,f6.length-2) + "\n]" ;
@@ -799,7 +799,7 @@ cols:[
 f7 = "" ;
 
 for(var i = 0; i < 24 ; i++){
-  f7 = f7 + '{ "pace20":"' + Valid_Slot(n1+20,i,"") + '", "pace13":"' + Valid_Slot(n1+13,i,"") + '", "pace6":"' + Valid_Slot(n1+6,i,"") + '", "km":"' + slots[i] + '"},\n'
+  f7 = f7 + '{ "pace20":"' + Valid_Slot(n1+20,i,null) + '", "pace13":"' + Valid_Slot(n1+13,i,null) + '", "pace6":"' + Valid_Slot(n1+6,i,null) + '", "km":"' + slots[i] + '"},\n'
  }
 
 f7 = "[\n" + f7.slice(0,f7.length-2) + "\n]" ;
@@ -886,6 +886,7 @@ webix.ui(
 </body>
 
 </html>
+
 
 
 
