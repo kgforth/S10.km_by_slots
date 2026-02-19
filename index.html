@@ -657,7 +657,7 @@ cols:[
 f4 = "" ;
 
 for(var i = 0; i < 24 ; i++){
-  f4 = f4 + '{ "pace17":"' + Valid_Slot(n1+17,i,"") + '", "pace10":"' + Valid_Slot(n1+10,i,"") + '", "pace3":"' + Valid_Slot(n1+3,i,"") + '", "km":"' + slots[i] + '"},\n'
+  f4 = f4 + '{ "pace17":"' + Valid_Slot(n1+17,i,null) + '", "pace10":"' + Valid_Slot(n1+10,i,null) + '", "pace3":"' + Valid_Slot(n1+3,i,null) + '", "km":"' + slots[i] + '"},\n'
  }
 
 f4 = "[\n" + f4.slice(0,f4.length-2) + "\n]" ;
@@ -886,6 +886,7 @@ webix.ui(
 </body>
 
 </html>
+
 
 
 
